@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PROTOCOL: CRUSH No.1 🐞</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f0f0f0;
+            color: #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border: 3px solid #000;
+            max-width: 550px;
+            width: 100%;
+            box-shadow: 8px 8px 0px #444;
+            position: relative;
+        }
+        h1 { 
+            font-size: 18px; 
+            text-transform: uppercase; 
+            border-bottom: 2px solid #000; 
+            padding-bottom: 10px; 
+            letter-spacing: 1px;
+            background: #000;
+            color: #fff;
+            margin-top: -30px;
+            margin-left: -30px;
+            margin-right: -30px;
+            padding-top: 15px;
+            margin-bottom: 20px;
+        }
+        p { font-size: 15px; line-height: 1.6; margin-bottom: 15px; }
+        .hint { font-size: 12px; color: #555; font-style: italic; margin-top: 5px; }
+        input {
+            padding: 12px;
+            border: 2px solid #555;
+            width: 70%;
+            font-family: inherit;
+            margin-top: 10px;
+            font-size: 16px;
+            text-align: center;
+            background: #fafafa;
+        }
+        button {
+            background-color: #222;
+            color: #0f0; /* Matrix green text */
+            border: 2px solid #000;
+            padding: 12px 30px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        button:hover { background-color: #000; }
+        .hidden { display: none; }
+        .error { color: #d00; font-weight: bold; margin-top: 10px; font-size: 13px; }
+        
+        /* Game Styles */
+        #gameWrapper {
+            position: relative;
+            width: 300px;
+            height: 150px;
+            margin: 0 auto;
+            border: 2px solid #000;
+            background: #fff;
+            overflow: hidden;
+        }
+        canvas { display: block; }
+        
+        /* Matching Game Styles */
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .match-btn {
+            padding: 8px;
+            font-size: 12px;
+            border: 1px solid #555;
+            background: #eee;
+            cursor: pointer;
+            color: #333;
+        }
+        .match-btn.selected { background: #bbb; }
+        .match-btn.matched { background: #8f8; border-color: #050; pointer-events: none; }
+
+        /* Final Reveal Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .gallery img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+        .info-box {
+            background: #e8f4f8;
+            border: 1px solid #99c;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 13px;
+            text-align: left;
+        }
+        .bday {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d33682;
+            margin-top: 20px;
+            border-top: 1px dashed #999;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="level0">
+        <h1>PROJECT: 33RD ORBIT</h1>
+        <p>I am small.</p>
+        <p>I feel very relaxed with alcohol.</p>
+        <p>I attach myself to you and I don't let go.</p>
+        <p><strong>Who am I?</strong></p>
+        <input type="text" id="ans0" placeholder="...">
+        <button onclick="check(0)">IDENTIFY</button>
+        <p class="error" id="err0"></p>
+    </div>
+
+    <div class="container hidden" id="level1">
+        <h1>Ph: 1 / Equipment Check</h1>
+        <p>Remember surfing in Arcachon? 🏄‍♀️</p>
+        <p>I need you to pack the same outfit.</p>
+        <p>Hypothesis: We will use it in boiling water instead of the ocean.</p>
+        <p><strong>Item Name:</strong></p>
+        <input type="text" id="ans1">
+        <button onclick="check(1)">VALIDATE</button>
+        <p class="error" id="err1"></p>
+    </div>
+
+    <div class="container hidden" id="level2">
+        <h1>Ph: 2 / Thermal Protection</h1>
+        <p>Contrast Check. At Aiguille du Midi, it was freezing.</p>
+        <p>If you don't bring this item, I will have to listen to you complaining about your ears. 🥶</p>
+        <input type="text" id="ans2">
+        <button onclick="check(2)">VALIDATE</button>
+        <p class="error" id="err2"></p>
+    </div>
+
+    <div class="container hidden" id="level3">
+        <h1>Ph: 3 / Thermal Shock 🌡️</h1>
+        <p>We need to calculate the thermal amplitude of the trip.</p>
+        <p><strong>Inside Water:</strong> 40°C</p>
+        <p><strong>Outside Air:</strong> 5°C</p>
+        <p>Calculate the <strong>Delta T</strong> (Difference) and convert it to <strong>DEGREES FAHRENHEIT</strong> for our American colleagues.</p>
+        <p class="hint">Hint: &Delta;T(°F) = &Delta;T(°C) x 1.8</p>
+        <input type="number" id="ans3">
+        <button onclick="check(3)">CALCULATE</button>
+        <p class="error" id="err3"></p>
+    </div>
+
+    <div class="container hidden" id="level4">
+        <h1>Ph: 4 / Memory Retrieval 🧠</h1>
+        <p>Flashback to the first sleepover.</p>
+        <p>I lifted your t-shirt (hihi) and saw a logo.</p>
+        <p><strong>What was written on your clothes?</strong></p>
+        <input type="text" id="ans4">
+        <button onclick="check(4)">VERIFY</button>
+        <p class="error" id="err4"></p>
+    </div>
+
+    <div class="container hidden" id="level5">
+        <h1>Ph: 5 / Activity Log</h1>
+        <p>We did a tennis camp. We are going to Marrakech to play tennis.</p>
+        <p>But this weekend... tennis is <strong>NOT</strong> the sport theme.</p>
+        <p>Our bodies will remain in high intensity.</p>
+        <p><strong>What is the activity?</strong></p>
+        <input type="text" id="ans5" placeholder="???">
+        <button onclick="check(5)">CONFIRM</button>
+        <p class="error" id="err5"></p>
+    </div>
+
+    <div class="container hidden" id="level6">
+        <h1>Ph: 6 / SURVIVAL MODE ☣️</h1>
+        <p>You are the Tick (Carrapato).</p>
+        <p><strong>Mission:</strong> Survive the Lab Hazards.</p>
+        <p>Avoid the <strong>Toxic Drops</strong> (Green) falling from above AND jump the obstacles.</p>
+        <p><strong>Score 10 to survive.</strong></p>
+        <p class="hint">Click or Space to Jump.</p>
+        <div id="gameWrapper">
+            <canvas id="gameCanvas" width="300" height="150"></canvas>
+        </div>
+        <button id="nextLevelBtn" class="hidden" onclick="nextLevel(6)">LEVEL CLEARED - PROCEED</button>
+    </div>
+
+    <div class="container hidden" id="level7">
+        <h1>Ph: 7 / Sommelier Test 🍷</h1>
+        <p>You introduced me to good white wine. Now prove you know your geography.</p>
+        <p><strong>Match the Wine to the Region.</strong></p>
+        <p class="hint">(Click Wine -> Click Region)</p>
+        
+        <div class="match-grid" id="matchGrid">
+            </div>
+        
+        <p id="wineStatus">Status: Matching...</p>
+        <button id="wineNextBtn" class="hidden" onclick="nextLevel(7)">VALIDATED - PROCEED</button>
+    </div>
+
+    <div class="container hidden" id="level8">
+        <h1>Ph: 8 / Biological Samples 🧀</h1>
+        <p>Regarding the wine from the previous level...</p>
+        <p>We are going to a region near its origin, famous for a different cheese.</p>
+        <p>It smells strong. It has the shape of a <strong>Heart</strong>.</p>
+        <p><strong>Name the cheese:</strong></p>
+        <input type="text" id="ans8">
+        <button onclick="check(8)">SUBMIT</button>
+        <p class="error" id="err8"></p>
+    </div>
+
+    <div class="container hidden" id="level9">
+        <h1>Ph: 9 / Structural Integrity</h1>
+        <p>We will drive past Beauvais.</p>
+        <p>The Cathedral there is famous because the roof is:</p>
+        <p>A) Very low<br>B) The highest in the world (and unstable)<br>C) Made of cheese</p>
+        <input type="text" id="ans9" placeholder="A, B or C">
+        <button onclick="check(9)">SUBMIT</button>
+        <p class="error" id="err9"></p>
+    </div>
+
+    <div class="container hidden" id="level10">
+        <h1>🎉 MISSION ACCOMPLISHED 🎉</h1>
+        
+        <div class="bday">
+            HAPPY 33rd BIRTHDAY, CRUSH NO.1
+        </div>
+        <p>I hope this escape makes your 33rd year full of memorable moments.</p>
+
+        <p><strong>DESTINATION:</strong> Roy-Boissy (Picardie)</p>
+        <p><strong>DATE:</strong> Dec 13-14 (Sat-Sun)</p>
+        
+        <div class="gallery">
+            <img src="https://pausevieuxmoulin.com/wp-content/uploads/2024/02/Design-sans-titre-10.jpg">
+            <img src="https://pausevieuxmoulin.com/wp-content/uploads/2024/02/Design-sans-titre-11.jpg">
+            <img src="https://pausevieuxmoulin.com/wp-content/uploads/2024/02/Design-sans-titre-12.jpg">
+            <img src="https://pausevieuxmoulin.com/wp-content/uploads/2022/07/Au-vieux-moulin-WEB-28-scaled.jpg">
+        </div>
+
+        <div class="info-box">
+            <p><strong>🌡️ Forecast:</strong> Cold. Bring the hat!</p>
+            <p><strong>🔥 Activity:</strong> Private Nordic Bath (40°C).</p>
+            <p><strong>🍷 Agenda:</strong> We will drink wine.</p>
+            <p><strong>🌲 Nature:</strong> "Grande balade (4h) - Hameaux, Roy, Boissy."</p>
+            <p><strong>🏘️ Village:</strong> Gemini AI swears Gerberoy is "cute". (Robots lie, so we'll judge for ourselves).</p>
+        </div>
+    </div>
+
+    <script>
+        // --- GENERAL LOGIC ---
+        function check(lvl) {
+            let inp = document.getElementById('ans'+lvl).value.toLowerCase().trim();
+            let err = document.getElementById('err'+lvl);
+            let success = false;
+
+            if(lvl === 0) { // Intro
+                if(inp.includes('tick') || inp.includes('carrapato') || inp.includes('tique')) success = true;
+            }
+            else if(lvl === 1) { // Bikini
+                if(inp.includes('bikini') || inp.includes('maillot') || inp.includes('swim')) success = true;
+            }
+            else if(lvl === 2) { // Hat
+                if(inp.includes('hat') || inp.includes('beanie') || inp.includes('bonnet') || inp.includes('gorro')) success = true;
+            }
+            else if(lvl === 3) { // Math FAHRENHEIT
+                // Delta C = 40 - 5 = 35
+                // Delta F = 35 * 1.8 = 63
+                if(inp == '63') success = true;
+            }
+            else if(lvl === 4) { // Cochin
+                if(inp.includes('cochin')) success = true;
+            }
+            else if(lvl === 5) { // Sex
+                if(inp === 'sex' || inp === 'sexe' || inp === 'sexo') success = true;
+            }
+            // Level 6 is Game, Level 7 is Wine
+            else if(lvl === 8) { // Cheese
+                if(inp.includes('neufchatel') || inp.includes('neufchâtel') || inp.includes('coeur') || inp.includes('heart')) success = true;
+            }
+            else if(lvl === 9) { // Cathedral
+                if(inp === 'b' || inp.includes('high') || inp.includes('haut')) success = true;
+            }
+
+            if(success) {
+                nextLevel(lvl);
+            } else {
+                err.innerText = "Error. Recalculate. Try again.";
+            }
+        }
+
+        function nextLevel(current) {
+            document.getElementById('level'+current).classList.add('hidden');
+            let next = current + 1;
+            
+            // Special initialization for Games
+            if(document.getElementById('level'+next)) {
+                document.getElementById('level'+next).classList.remove('hidden');
+                if(next === 6) initGame();
+                if(next === 7) initWineGame();
+            }
+        }
+
+        // --- WINE GAME LOGIC ---
+        const wines = [
+            { id: 1, name: "Condrieu", pair: "Rhône" },
+            { id: 2, name: "Cahors", pair: "Sud-Ouest" },
+            { id: 3, name: "Gewurztraminer", pair: "Alsace" },
+            { id: 4, name: "Chablis", pair: "Bourgogne" }
+        ];
+        
+        let selectedWine = null;
+        let selectedRegion = null;
+        let matchesFound = 0;
+
+        function initWineGame() {
+            const grid = document.getElementById('matchGrid');
+            grid.innerHTML = "";
+            let nameList = [...wines].sort(() => Math.random() - 0.5);
+            let regionList = [...wines].sort(() => Math.random() - 0.5);
+
+            nameList.forEach(w => {
+                let btn = document.createElement('button');
+                btn.className = 'match-btn wine';
+                btn.innerText = w.name;
+                btn.onclick = () => selectItem(btn, 'wine', w.name, w.pair);
+                grid.appendChild(btn);
+            });
+
+            regionList.forEach(w => {
+                let btn = document.createElement('button');
+                btn.className = 'match-btn region';
+                btn.innerText = w.pair;
+                btn.onclick = () => selectItem(btn, 'region', w.pair, w.name);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectItem(btn, type, value, matchValue) {
+            if(btn.classList.contains('matched')) return;
+            document.querySelectorAll(`.match-btn.${type}`).forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            if(type === 'wine') selectedWine = { btn, value, matchValue };
+            else selectedRegion = { btn, value, matchValue };
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if(selectedWine && selectedRegion) {
+                if(selectedWine.matchValue === selectedRegion.value) {
+                    selectedWine.btn.classList.remove('selected');
+                    selectedRegion.btn.classList.remove('selected');
+                    selectedWine.btn.classList.add('matched');
+                    selectedRegion.btn.classList.add('matched');
+                    matchesFound++;
+                    selectedWine = null; selectedRegion = null;
+                    if(matchesFound === 4) {
+                        document.getElementById('wineStatus').innerText = "IDENTIFIED: Chablis (Your Favorite)";
+                        document.getElementById('wineStatus').style.color = "green";
+                        document.getElementById('wineNextBtn').classList.remove('hidden');
+                    }
+                } else {
+                    setTimeout(() => {
+                        if(selectedWine) selectedWine.btn.classList.remove('selected');
+                        if(selectedRegion) selectedRegion.btn.classList.remove('selected');
+                        selectedWine = null; selectedRegion = null;
+                    }, 500);
+                }
+            }
+        }
+
+        // --- TICK GAME ENGINE ---
+        let canvas, ctx, player, obstacles, drops, gameInterval, score;
+        let gameRunning = false;
+
+        function initGame() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            score = 0;
+            obstacles = [];
+            drops = [];
+            gameRunning = true;
+            player = { x: 30, y: 100, r: 8, dy: 0, jump: -7, grav: 0.4, grounded: false };
+            
+            canvas.addEventListener('mousedown', function(e){ e.preventDefault(); jump(); });
+            document.addEventListener('keydown', (e) => { 
+                if(e.code==='Space') { e.preventDefault(); jump(); }
+            });
+            
+            if(gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(updateGame, 20);
+        }
+
+        function jump() {
+            if(player.grounded) { player.dy = player.jump; player.grounded = false; }
+        }
+
+        function drawTick(x, y) {
+            ctx.fillStyle = "#5D4037"; 
+            ctx.beginPath(); ctx.arc(x, y, 8, 0, Math.PI*2); ctx.fill(); 
+            ctx.strokeStyle = "black"; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x-10, y-5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+10, y-5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x-10, y+5); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x+10, y+5); ctx.stroke();
+        }
+
+        function updateGame() {
+            if(!gameRunning) return;
+            ctx.clearRect(0,0,300,150);
+            
+            player.dy += player.grav;
+            player.y += player.dy;
+            if(player.y > 130) { player.y = 130; player.dy = 0; player.grounded = true; }
+            drawTick(player.x, player.y);
+
+            if(Math.random() < 0.02) obstacles.push({x: 300, w: 15, h: 20});
+            for(let i=0; i<obstacles.length; i++) {
+                let o = obstacles[i];
+                o.x -= 3;
+                ctx.fillStyle = "#333";
+                ctx.fillRect(o.x, 150-o.h, o.w, o.h);
+                if(player.x+5 > o.x && player.x-5 < o.x+o.w && player.y+5 > 150-o.h) { resetGame(); return; }
+                if(o.x + o.w < 0) { obstacles.shift(); score++; i--; }
+            }
+
+            if(Math.random() < 0.03) drops.push({x: Math.random() * 200 + 50, y: 0});
+            for(let j=0; j<drops.length; j++) {
+                let d = drops[j];
+                d.y += 2;
+                ctx.fillStyle = "#0f0";
+                ctx.beginPath(); ctx.arc(d.x, d.y, 4, 0, Math.PI*2); ctx.fill();
+                let dx = player.x - d.x; let dy = player.y - d.y;
+                if(Math.sqrt(dx*dx + dy*dy) < 12) { resetGame(); return; }
+                if(d.y > 150) { drops.shift(); j--; }
+            }
+
+            ctx.fillStyle = "black"; ctx.font = "14px Courier";
+            ctx.fillText("Score: " + score + "/10", 10, 20);
+            if(score >= 10) {
+                gameRunning = false;
+                ctx.fillStyle = "#d33682"; ctx.font = "bold 20px Courier";
+                ctx.fillText("SURVIVED!", 100, 75);
+                document.getElementById('nextLevelBtn').classList.remove('hidden');
+                clearInterval(gameInterval);
+            }
+        }
+
+        function resetGame() {
+            ctx.fillStyle = "rgba(255,0,0,0.5)"; ctx.fillRect(0,0,300,150);
+            ctx.fillStyle = "white"; ctx.fillText("FAIL. RESTARTING...", 70, 75);
+            gameRunning = false;
+            setTimeout(initGame, 1000);
+        }
+    </script>
+</body>
+</html>
